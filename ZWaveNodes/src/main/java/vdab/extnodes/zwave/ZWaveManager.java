@@ -6,6 +6,7 @@ import java.util.HashMap;
 import org.zwave4j.Manager;
 import org.zwave4j.Notification;
 import org.zwave4j.NotificationWatcher;
+import org.zwave4j.Options;
 
 import com.lcrc.af.AnalysisData;
 import com.lcrc.af.AnalysisObject;
@@ -35,6 +36,11 @@ public class ZWaveManager  extends AnalysisObject implements NotificationWatcher
 	public ZWaveManager(String port){
 		Manager c_Manager = Manager.create();
 		c_ZWavePort = port;
+/*		
+	      final Options options = Options.create("TRY SOME ARGS", "", "");
+	        options.addOptionBool("ConsoleOutput", false);
+	        options.lock();
+	        */
 		c_Manager.addWatcher(this, null);
 		c_Manager.addDriver(port);
 	}
