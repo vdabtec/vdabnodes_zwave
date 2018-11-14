@@ -13,7 +13,7 @@
 	</datadef>
  </nodedef>
  <nodedef name="ZWaveTarget" class="vdab.extnodes.zwave.ZWaveTarget">
-  	<attr name="ConsumedEventTypes">String,Event</attr>
+  	<attr name="ConsumedEventTypes">Trigger,String,Event</attr>
     <attr name="PublishedEventTypes">NONE</attr>
     <attr name="NodeDescTemplate"> ${ZWavePort}</attr>
     <attr name="NodeOverview">Prototype which reads captures images from a Foscam Security Camera using appropriate HTTP posts. The address and port must be accessible and specified.</attr>

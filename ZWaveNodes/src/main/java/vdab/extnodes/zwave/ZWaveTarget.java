@@ -26,11 +26,13 @@ public class ZWaveTarget extends AnalysisTarget {
 	}
 
 	public synchronized void processEvent(AnalysisEvent ev){
+		/*
 		AnalysisData ad =  getSelectedData(ev);
 		if (ad == null ){
 			setWarning("Selected data not available EVENT="+ev);
 			return;
 		}
+		*/
 		
 		if (c_IsOn){
 			c_ZWaveManager.switchAllOff();
