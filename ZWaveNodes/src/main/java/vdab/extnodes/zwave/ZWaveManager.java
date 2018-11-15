@@ -106,8 +106,15 @@ public class ZWaveManager  extends AnalysisObject implements NotificationWatcher
 	}
 	@Override
 	public void onNotification(Notification notification, Object objArg) {
+		short nodeId = notification.getNodeId() ;
+		if (nodeId > 1 && nodeId < 255)
+			ZWaveNodeInfo.updateFromNotification(c_Manager, nodeId, notification, objArg);
+
+		AnalysisObject.logInfo("onNotification",">>>> NODEID="+notification.getNodeId()+" TYPE="+notification.getType().name());
 		try {
 			switch (notification.getType()) {
+
+			// OVERALL ---------------------------------------------------
 			case DRIVER_READY:
 				pushNotification(String.format("Driver ready\n" +
 						"\thome id: %d",
@@ -124,7 +131,6 @@ public class ZWaveManager  extends AnalysisObject implements NotificationWatcher
 			case AWAKE_NODES_QUERIED:
 				pushNotification("Awake nodes queried");
 				break;
-
 			case ALL_NODES_QUERIED:
 				pushNotification("All nodes queried");
 				c_Manager.writeConfig(c_HomeId);
@@ -145,6 +151,7 @@ public class ZWaveManager  extends AnalysisObject implements NotificationWatcher
 				pushNotification("Polling disabled");
 				break;
 
+			// NODE ---------------------------------------------------
 			case NODE_NEW:
 				pushNotification(String.format("Node new\n" +
 						"\tnode id: %d",
@@ -265,7 +272,7 @@ public class ZWaveManager  extends AnalysisObject implements NotificationWatcher
 						ValueConverter.getValue(notification.getValueId())
 						));
 				break;
-
+			//  MISC ------------------------------------------------------
 			case GROUP:
 				pushNotification(String.format("Group\n" +
 						"\tnode id: %d\n" +

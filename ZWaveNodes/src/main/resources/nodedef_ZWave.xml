@@ -23,5 +23,17 @@
 		<attr name="Category">Required</attr>
 		<attr name="Desc">ZWave device port</attr>				
 	</datadef>
+	<datadef name="DeviceType">
+		<attr name="EditOrder" type="Integer">3</attr>
+		<attr name="Category">Required</attr>
+   		<attr name="RefreshOnChange" type="Boolean">true</attr>
+		<attr name="Enum">ZWaveDeviceType</attr>
+		<attr name="Desc">Pick the proper ZWave device type.</attr>				
+	</datadef>
+	<datadef name="NodeName">
+		<attr name="EditOrder" type="Integer">4</attr>
+		<attr name="Category">Required</attr>
+		<attr name="Desc">Pick from the existing nodes of this type.</attr>				
+	</datadef>
  </nodedef>
 </nodedefs>
