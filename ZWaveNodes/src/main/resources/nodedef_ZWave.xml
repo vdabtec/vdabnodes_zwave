@@ -1,38 +1,61 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <nodedefs>   
-<nodedef name="ZWaveSource" class="vdab.extnodes.zwave.ZWaveSource">
-  	<attr name="ConsumedEventTypes">NONE</attr>
+<nodedef name="ZWaveNotificationSource" class="vdab.extnodes.zwave.ZWaveNotificationSource">
+    <attr name="ConsumedEventTypes">NONE</attr>
     <attr name="PublishedEventTypes">String,Event</attr>
     <attr name="NodeDescTemplate"> ${ZWavePort}</attr>
+    <attr name="NodeOverview">Receives notifications from the ZWave Controller.</attr>
+    <attr name="NodeQuality" >Prototype</attr>   
+	<datadef name="ZWavePort">
+		<attr name="EditOrder" type="Integer">2</attr>
+		<attr name="Category">Required</attr>
+		<attr name="Desc">ZWave device port</attr>				
+	</datadef>
+	<datadef name="Node">
+		<attr name="EditOrder" type="Integer">22</attr>
+		<attr name="Category">Required</attr>
+		<attr name="EditWhileRunning" type="Boolean">true</attr>
+		<attr name="Desc">Pick from the existing nodes of this type.</attr>				
+	</datadef>
+</nodedef>
+<nodedef name="ZWaveSensor" class="vdab.extnodes.zwave.ZWaveSensor">
+    <attr name="ConsumedEventTypes">NONE</attr>
+    <attr name="PublishedEventTypes">String,Event</attr>
+    <attr name="NodeDescTemplate"> ${ZWavePort} ${Node}</attr>
     <attr name="NodeOverview">Prototype which reads captures images from a Foscam Security Camera using appropriate HTTP posts. The address and port must be accessible and specified.</attr>
     <attr name="NodeQuality" >Prototype</attr>   
 	<datadef name="ZWavePort">
 		<attr name="EditOrder" type="Integer">2</attr>
 		<attr name="Category">Required</attr>
 		<attr name="Desc">ZWave device port</attr>				
+	</datadef>
+	<datadef name="Node">
+		<attr name="EditOrder" type="Integer">22</attr>
+		<attr name="Category">Required</attr>
+		<attr name="EditWhileRunning" type="Boolean">true</attr>
+		<attr name="Desc">Pick from the existing nodes of this type.</attr>				
 	</datadef>
  </nodedef>
- <nodedef name="ZWaveTarget" class="vdab.extnodes.zwave.ZWaveTarget">
-  	<attr name="ConsumedEventTypes">Trigger,String,Event</attr>
+ <nodedef name="ZWaveSwitch" class="vdab.extnodes.zwave.ZWaveSwitch">
+    <attr name="ConsumedEventTypes">Trigger,String,Event</attr>
     <attr name="PublishedEventTypes">NONE</attr>
-    <attr name="NodeDescTemplate"> ${ZWavePort}</attr>
-    <attr name="NodeOverview">Prototype which reads captures images from a Foscam Security Camera using appropriate HTTP posts. The address and port must be accessible and specified.</attr>
+    <attr name="NodeDescTemplate"> ${ZWavePort} ${Node}</attr>
+    <attr name="NodeOverview">Turns on and off a ZWave switch. Sending a trigger event toggles the switch..</attr>
     <attr name="NodeQuality" >Prototype</attr>   
 	<datadef name="ZWavePort">
 		<attr name="EditOrder" type="Integer">2</attr>
 		<attr name="Category">Required</attr>
 		<attr name="Desc">ZWave device port</attr>				
 	</datadef>
-	<datadef name="DeviceType">
-		<attr name="EditOrder" type="Integer">3</attr>
-		<attr name="Category">Required</attr>
-   		<attr name="RefreshOnChange" type="Boolean">true</attr>
-		<attr name="Enum">ZWaveDeviceType</attr>
-		<attr name="Desc">Pick the proper ZWave device type.</attr>				
+	 <datadef name="SelectedElement">
+		<attr name="Category">Standard</attr>
+		<attr name="EditWhileRunning" type="Boolean">true</attr>
+		<attr name="EditOrder" type="Integer">15</attr>
 	</datadef>
-	<datadef name="NodeName">
-		<attr name="EditOrder" type="Integer">4</attr>
+	<datadef name="Node">
+		<attr name="EditOrder" type="Integer">22</attr>
 		<attr name="Category">Required</attr>
+		<attr name="EditWhileRunning" type="Boolean">true</attr>
 		<attr name="Desc">Pick from the existing nodes of this type.</attr>				
 	</datadef>
  </nodedef>

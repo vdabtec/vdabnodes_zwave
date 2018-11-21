@@ -1,12 +1,15 @@
 package vdab.extnodes.zwave;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.zwave4j.Manager;
 import org.zwave4j.Notification;
+import org.zwave4j.NotificationType;
 import org.zwave4j.NotificationWatcher;
 import org.zwave4j.Options;
+import org.zwave4j.ValueId;
 
 import com.lcrc.af.AnalysisData;
 import com.lcrc.af.AnalysisDataDef;
@@ -23,6 +26,9 @@ public class ZWaveManager  extends AnalysisObject implements NotificationWatcher
 				.setRequired().setEditOrder(12)};
 		
 	public static ZWaveManager getZWaveManager(String port){
+		if (port == null)
+			return null;
+		
 		ZWaveManager manager = s_PortZWaveManager_map.get(port);
 		if (manager == null){
 			manager = new ZWaveManager(port);
@@ -30,26 +36,19 @@ public class ZWaveManager  extends AnalysisObject implements NotificationWatcher
 		}
 		return manager;
 	}
-	private ArrayList<ZWaveSource> c_ZWaveSourceList = new ArrayList<ZWaveSource>();
-	private ArrayList<ZWaveTarget> c_ZWaveTargetList = new ArrayList<ZWaveTarget>();
+	private ArrayList<ZWaveSource_A> c_ZWaveSourceList = new ArrayList<ZWaveSource_A>();
+	private ArrayList<ZWaveTarget_A> c_ZWaveTargetList = new ArrayList<ZWaveTarget_A>();
+	private ArrayList<ZWaveNotificationSource> c_ZWaveNotificationSourceList = new ArrayList<ZWaveNotificationSource>();
 	private long c_HomeId;
-	private final Manager c_Manager;
+	private Manager c_Manager;
 	private boolean c_IsReady = false;
-	private String c_ZWaveConfigDirectory = "/home/pi/open-zwave/config";
+	private String c_ZWaveConfigDirectory = "/home/pi/open-zwave/config" ;
 	
 	private String c_ZWavePort;
 	public ZWaveManager(String port){
-	
 		c_ZWavePort = port;
-		final Options options = Options.create(c_ZWaveConfigDirectory, "", "");
-	    options.addOptionBool("ConsoleOutput", false);
-	    options.lock();
-	    c_Manager = Manager.create();
-		
-	
-		c_Manager.addWatcher(this, null);
-		c_Manager.addDriver(port);
 	}
+	
 	public String get_ZWaveConfigDirectory(){
 		return c_ZWaveConfigDirectory;
 		
@@ -58,134 +57,189 @@ public class ZWaveManager  extends AnalysisObject implements NotificationWatcher
 		c_ZWaveConfigDirectory = dir;
 		
 	}
-	public void addZWaveSource(ZWaveSource as){
+	public void init(){
+
+		if (c_Manager != null) // Only init if needed.
+			return;
+	
+		if (c_ZWaveConfigDirectory == null || !(new File(c_ZWaveConfigDirectory).exists())){
+			setError("ZWave Config Directory can not be found, please this attribute");
+			c_Manager = null;
+			return;
+		}
+
+		try {
+			final Options options = Options.create(c_ZWaveConfigDirectory, "", "");
+			options.addOptionBool("ConsoleOutput", false);
+			options.lock();
+			c_Manager = Manager.create();
+			c_Manager.addWatcher(this, null);
+			c_Manager.addDriver(c_ZWavePort);
+
+		}
+		catch (Exception e){
+			setError("Uable to initialize ZWave connection e>"+e);
+			c_Manager = null;
+		}
+
+	}
+	public boolean isInitialized(){
+		return c_Manager != null;
+	}
+	public void addZWaveSource(ZWaveSource_A as){
 		
 		try {
 			as.addDelegatedAttribute("ZWaveConfigDirectory", this);
-			c_ZWaveSourceList.add(as);	
+			if (!c_ZWaveSourceList.contains(as))
+				c_ZWaveSourceList.add(as);	
 		}
 		catch (Exception e){
 			as.setError("Unable to add this ZWaveSource to the manager e>"+e);
 		}
 
 	}
-	public void removeZWaveSource(ZWaveSource as){
+	public void removeZWaveSource(ZWaveSource_A as){
 		c_ZWaveSourceList.remove(as);	
 	}
-	public void addZWaveTarget(ZWaveTarget at){
+	public void addZWaveTarget(ZWaveTarget_A at){
 		try {
 			at.addDelegatedAttribute("ZWaveConfigDirectory", this);
-			c_ZWaveTargetList.add(at);	
+			if (!c_ZWaveTargetList.contains(at))
+				c_ZWaveTargetList.add(at);	
 		}
 		catch (Exception e){
 			at.setError("Unable to add this ZWaveTarget to the manager e>"+e);
 		}
 	
 	}
-	public void removeZWaveTarget(ZWaveTarget at){
+	public void removeZWaveTarget(ZWaveTarget_A at){
 		c_ZWaveTargetList.remove(at);	
 	}
-	private void pushNotification(String info){
-		pushNotification(new AnalysisData("Notification",info));
+	public void addZWaveNotificationSource(ZWaveNotificationSource as){	
+		try {
+			as.addDelegatedAttribute("ZWaveConfigDirectory", this);
+			if (!c_ZWaveNotificationSourceList.contains(as))
+				c_ZWaveNotificationSourceList.add(as);	
+		}
+		catch (Exception e){
+			as.setError("Unable to add this ZWaveControlService to the manager e>"+e);
+		}
+
 	}
-	private void pushNotification(AnalysisData ad){	
-		for (ZWaveSource as: c_ZWaveSourceList)
-			as.publishIndividualEvent(ad);
+	public void removeZWaveNotificationSource(ZWaveNotificationSource as){
+		c_ZWaveNotificationSourceList.remove(as);	
 	}
+	private void handleNotification(short nodeId, String info){
+		if (c_ZWaveNotificationSourceList.size() > 0){
+			AnalysisData ad = new AnalysisData("Notification",info);
+			for (ZWaveNotificationSource as: c_ZWaveNotificationSourceList){
+				if (as.isRunning() && as.shouldReport((int) nodeId))
+					as.publishNotificationEvent(ad);
+			}
+		}
+	}
+
 	public Manager getManager(){
 		return c_Manager;
-	}
-	
-	public void switchAllOn(){
-		c_Manager.switchAllOn(c_HomeId);
-		
-	}
-	public void switchAllOff(){
-		c_Manager.switchAllOff(c_HomeId);
-		
 	}
 	@Override
 	public void onNotification(Notification notification, Object objArg) {
 		short nodeId = notification.getNodeId() ;
-		if (nodeId > 1 && nodeId < 255)
+		short classId = notification.getValueId().getCommandClassId();
+		
+		NotificationType  type = notification.getType();
+		if (nodeId > 1 && nodeId < 255){
+			// Handle keeping the Node Data.
 			ZWaveNodeInfo.updateFromNotification(c_Manager, nodeId, notification, objArg);
 
-		AnalysisObject.logInfo("onNotification",">>>> NODEID="+notification.getNodeId()+" TYPE="+notification.getType().name());
+			// Handle events that should be published.
+			switch (type){
+			
+			case VALUE_ADDED:
+			case VALUE_CHANGED:
+				if (classId == 48 || classId == 49)
+					handleValueChange(nodeId, notification, objArg);
+				break;
+
+			}
+		}
+
+		AnalysisObject.logInfo("onNotification",">>>> NODEID="+notification.getNodeId()+" TYPE="+type.name());
 		try {
-			switch (notification.getType()) {
+			switch (type) {
 
 			// OVERALL ---------------------------------------------------
 			case DRIVER_READY:
-				pushNotification(String.format("Driver ready\n" +
+				handleNotification(nodeId, String.format("Driver ready\n" +
 						"\thome id: %d",
 						notification.getHomeId()
 						));
 				c_HomeId = notification.getHomeId();
 				break;
 			case DRIVER_FAILED:
-				pushNotification("Driver failed");
+				handleNotification(nodeId, "Driver failed");
 				break;
 			case DRIVER_RESET:
-				pushNotification("Driver reset");
+				handleNotification(nodeId, "Driver reset");
 				break;
 			case AWAKE_NODES_QUERIED:
-				pushNotification("Awake nodes queried");
+				handleNotification(nodeId, "Awake nodes queried");
 				break;
 			case ALL_NODES_QUERIED:
-				pushNotification("All nodes queried");
+				handleNotification(nodeId, "All nodes queried");
 				c_Manager.writeConfig(c_HomeId);
 				c_IsReady = true;
 				break;
 
 			case ALL_NODES_QUERIED_SOME_DEAD:
-				pushNotification("All nodes queried some dead");
+				handleNotification(nodeId, "All nodes queried some dead");
 				c_Manager.writeConfig(c_HomeId);
 				c_IsReady = true;
 				break;
 
 			case POLLING_ENABLED:
-				pushNotification("Polling enabled");
+				handleNotification(nodeId, "Polling enabled");
 				break;
 
 			case POLLING_DISABLED:
-				pushNotification("Polling disabled");
+				handleNotification(nodeId, "Polling disabled");
 				break;
 
 			// NODE ---------------------------------------------------
 			case NODE_NEW:
-				pushNotification(String.format("Node new\n" +
+				handleNotification(nodeId, String.format("Node new\n" +
 						"\tnode id: %d",
 						notification.getNodeId()
 						));
 				break;
 
 			case NODE_ADDED:
-				pushNotification(String.format("Node added\n" +
+				handleNotification(nodeId, String.format("Node added\n" +
 						"\tnode id: %d",
 						notification.getNodeId()
 						));
 				break;
 			case NODE_REMOVED:
-				pushNotification(String.format("Node removed\n" +
+				handleNotification(nodeId, String.format("Node removed\n" +
 						"\tnode id: %d",
 						notification.getNodeId()
 						));
 				break;
 			case ESSENTIAL_NODE_QUERIES_COMPLETE:
-				pushNotification(String.format("Node essential queries complete\n" +
+				handleNotification(nodeId, String.format("Node essential queries complete\n" +
 						"\tnode id: %d",
 						notification.getNodeId()
 						));
 				break;
 			case NODE_QUERIES_COMPLETE:
-				pushNotification(String.format("Node queries complete\n" +
+				handleNotification(nodeId, String.format("Node queries complete\n" +
 						"\tnode id: %d",
 						notification.getNodeId()
 						));
 				break;
 
 			case NODE_EVENT:
-				pushNotification(String.format("Node event\n" +
+				handleNotification(nodeId, String.format("Node event\n" +
 						"\tnode id: %d\n" +
 						"\tevent id: %d",
 						notification.getNodeId(),
@@ -194,14 +248,14 @@ public class ZWaveManager  extends AnalysisObject implements NotificationWatcher
 				break;
 
 			case NODE_NAMING:
-				pushNotification(String.format("Node naming\n" +
+				handleNotification(nodeId, String.format("Node naming\n" +
 						"\tnode id: %d",
 						notification.getNodeId()
 						));
 				break;
 
 			case NODE_PROTOCOL_INFO:
-				pushNotification(String.format("Node protocol info\n" +
+				handleNotification(nodeId, String.format("Node protocol info\n" +
 						"\tnode id: %d\n" +
 						"\ttype: %s",
 						notification.getNodeId(),
@@ -210,7 +264,7 @@ public class ZWaveManager  extends AnalysisObject implements NotificationWatcher
 				break;
 
 			case VALUE_ADDED:
-				pushNotification(String.format("Value added\n" +
+				handleNotification(nodeId, String.format("Value added\n" +
 						"\tnode id: %d\n" +
 						"\tcommand class: %d\n" +
 						"\tinstance: %d\n" +
@@ -231,7 +285,7 @@ public class ZWaveManager  extends AnalysisObject implements NotificationWatcher
 				break;
 
 			case VALUE_REMOVED:
-				pushNotification(String.format("Value removed\n" +
+				handleNotification(nodeId, String.format("Value removed\n" +
 						"\tnode id: %d\n" +
 						"\tcommand class: %d\n" +
 						"\tinstance: %d\n" +
@@ -244,7 +298,7 @@ public class ZWaveManager  extends AnalysisObject implements NotificationWatcher
 				break;
 
 			case VALUE_CHANGED:
-				pushNotification(String.format("Value changed\n" +
+				handleNotification(nodeId, String.format("Value changed\n" +
 						"\tnode id: %d\n" +
 						"\tcommand class: %d\n" +
 						"\tinstance: %d\n" +
@@ -259,7 +313,7 @@ public class ZWaveManager  extends AnalysisObject implements NotificationWatcher
 				break;
 
 			case VALUE_REFRESHED:
-				pushNotification(String.format("Value refreshed\n" +
+				handleNotification(nodeId, String.format("Value refreshed\n" +
 						"\tnode id: %d\n" +
 						"\tcommand class: %d\n" +
 						"\tinstance: %d\n" +
@@ -272,9 +326,9 @@ public class ZWaveManager  extends AnalysisObject implements NotificationWatcher
 						ValueConverter.getValue(notification.getValueId())
 						));
 				break;
-			//  MISC ------------------------------------------------------
+				//  MISC ------------------------------------------------------
 			case GROUP:
-				pushNotification(String.format("Group\n" +
+				handleNotification(nodeId, String.format("Group\n" +
 						"\tnode id: %d\n" +
 						"\tgroup id: %d",
 						notification.getNodeId(),
@@ -283,46 +337,46 @@ public class ZWaveManager  extends AnalysisObject implements NotificationWatcher
 				break;
 
 			case SCENE_EVENT:
-				pushNotification(String.format("Scene event\n" +
+				handleNotification(nodeId, String.format("Scene event\n" +
 						"\tscene id: %d",
 						notification.getSceneId()
 						));
 				break;
 
 			case CREATE_BUTTON:
-				pushNotification(String.format("Button create\n" +
+				handleNotification(nodeId, String.format("Button create\n" +
 						"\tbutton id: %d",
 						notification.getButtonId()
 						));
 				break;
 
 			case DELETE_BUTTON:
-				pushNotification(String.format("Button delete\n" +
+				handleNotification(nodeId, String.format("Button delete\n" +
 						"\tbutton id: %d",
 						notification.getButtonId()
 						));
 				break;
 
 			case BUTTON_ON:
-				pushNotification(String.format("Button on\n" +
+				handleNotification(nodeId, String.format("Button on\n" +
 						"\tbutton id: %d",
 						notification.getButtonId()
 						));
 				break;
 
 			case BUTTON_OFF:
-				pushNotification(String.format("Button off\n" +
+				handleNotification(nodeId, String.format("Button off\n" +
 						"\tbutton id: %d",
 						notification.getButtonId()
 						));
 				break;
 
 			case NOTIFICATION:
-				pushNotification("Notification");
+				handleNotification(nodeId, "Notification");
 				break;
 
 			default:
-				pushNotification(notification.getType().name());
+				handleNotification(nodeId, notification.getType().name());
 				break;
 			}
 		}
@@ -332,5 +386,53 @@ public class ZWaveManager  extends AnalysisObject implements NotificationWatcher
 
 
 	}
+
+	public void handleValueChange(short id, Notification notification, Object objRef){
+		if (c_ZWaveSourceList.size() > 0){
+			AnalysisData ad = new AnalysisData("Data",ValueConverter.getValue(notification.getValueId()));		
+			for (ZWaveSource_A as: c_ZWaveSourceList){
+				if (as.get_Node().byteValue() == id && as.isRunning())
+					as.publishIndividualEvent(ad);
+			}
+		}
+		
+	}
+	public void setSwitchLevel(int nodeId, int level){
+		ValueId valId = ZWaveNodeInfo.getValueIdForClass((short) nodeId, (short) ZWaveDeviceType.SWITCH_MULTILEVEL);
+		if (valId == null){
+			AnalysisObject.logError("ZWaveManager.setSwitchLevel()", "Failed retrieving value id for NODE="+nodeId);
+			return;
+		}
+		c_Manager.setValueAsByte(valId, (short) level);
+	}
+	
+	public void switchOneOn(int nodeId){
+
+		ValueId valId = ZWaveNodeInfo.getValueIdForClass((short) nodeId, (short) ZWaveDeviceType.SWITCH_BINARY);
+		if (valId == null){
+			AnalysisObject.logError("ZWaveManager.switchOneOn()", "Failed retrieving value id for NODE="+nodeId);
+			return;
+		}
+		c_Manager.setValueAsBool(valId, true);
+	}
+
+	public void switchOneOff(int nodeId){
+
+		ValueId valId = ZWaveNodeInfo.getValueIdForClass((short) nodeId, (short) ZWaveDeviceType.SWITCH_BINARY);
+		if (valId == null){
+			AnalysisObject.logError("ZWaveManager.switchOneOff()", "Failed retrieving value id for NODE="+nodeId);
+			return;
+		}
+		c_Manager.setValueAsBool(valId, false);
+	}
+	public void switchAllOn(){
+		c_Manager.switchAllOn(c_HomeId);
+
+	}
+	public void switchAllOff(){
+		c_Manager.switchAllOff(c_HomeId);
+
+	}
+
 
 }
