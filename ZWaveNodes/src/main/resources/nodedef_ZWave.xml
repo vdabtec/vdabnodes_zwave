@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <nodedefs>   
 <nodedef name="ZWaveNotificationSource" class="vdab.extnodes.zwave.ZWaveNotificationSource">
-    <attr name="ConsumedEventTypes">NONE</attr>
+     <attr name="ConsumedEventTypes">NONE</attr>
     <attr name="PublishedEventTypes">String,Event</attr>
     <attr name="NodeDescTemplate"> ${ZWavePort}</attr>
     <attr name="NodeOverview">Receives notifications from the ZWave Controller.</attr>
