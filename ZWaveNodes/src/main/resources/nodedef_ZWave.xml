@@ -1,62 +1,126 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<nodedefs>   
-<nodedef name="ZWaveNotificationSource" class="vdab.extnodes.zwave.ZWaveNotificationSource">
-     <attr name="ConsumedEventTypes">NONE</attr>
+<nodedefs>  
+<nodedef name="ZWaveQueryService" class="vdab.extnodes.zwave.ZWaveQueryService">
+    <attr name="ConsumedEventTypes">Trigger,Event</attr>
     <attr name="PublishedEventTypes">String,Event</attr>
-    <attr name="NodeDescTemplate"> ${ZWavePort}</attr>
-    <attr name="NodeOverview">Receives notifications from the ZWave Controller.</attr>
-    <attr name="NodeQuality" >Prototype</attr>   
-	<datadef name="ZWavePort">
-		<attr name="EditOrder" type="Integer">2</attr>
+    <attr name="NodeDescTemplate"> ${Node}: ${ClassCode}</attr>
+    <attr name="NodeOverview">Returns all the ZWave node attributes associated with a specific class code on the selected node.</attr>
+    <attr name="NodeQuality" >Beta</attr>   
+	<datadef name="Node">
+		<attr name="EditOrder" type="Integer">22</attr>
 		<attr name="Category">Required</attr>
-		<attr name="Desc">ZWave device port</attr>				
+		<attr name="EditWhileRunning" type="Boolean">true</attr>
+		<attr name="RefreshOnChange" type="Boolean">true</attr>		
+		<attr name="Desc">ZWave node to query</attr>				
+	</datadef>
+	<datadef name="ClassCode">
+		<attr name="EditOrder" type="Integer">23</attr>
+		<attr name="Category">Required</attr>
+		<attr name="EditWhileRunning" type="Boolean">true</attr>
+		<attr name="Desc">Class code for the attributes that will be returned</attr>				
+	</datadef>
+	<datadef name="OutputType">
+		<attr name="Category">Hidden</attr>
+	</datadef>
+</nodedef> 
+<nodedef name="ZWaveUpdateService" class="vdab.extnodes.zwave.ZWaveUpdateService">
+    <attr name="ConsumedEventTypes">Event</attr>
+    <attr name="PublishedEventTypes">Boolean,Trigger</attr>
+    <attr name="NodeDescTemplate"> ${Node}: ${ValueIndex}</attr>
+    <attr name="NodeOverview">Sets a specific attribute value on a ZWave node. Available values are dependent on the specific node type and class code selected.</attr>
+    <attr name="NodeQuality" >Beta</attr>   	
+	 <datadef name="SelectedElement">
+		<attr name="Category">Standard</attr>
+		<attr name="EditWhileRunning" type="Boolean">true</attr>
+		<attr name="EditOrder" type="Integer">15</attr>
+		<attr name="Desc">Select the specific simple data item from the event used to set the attribute.</attr>
 	</datadef>
 	<datadef name="Node">
 		<attr name="EditOrder" type="Integer">22</attr>
 		<attr name="Category">Required</attr>
 		<attr name="EditWhileRunning" type="Boolean">true</attr>
-		<attr name="Desc">Pick from the existing nodes of this type.</attr>				
+		<attr name="RefreshOnChange" type="Boolean">true</attr>		
+		<attr name="Desc">ZWave node to update</attr>				
+	</datadef>
+	<datadef name="ClassCode">
+		<attr name="EditOrder" type="Integer">23</attr>
+		<attr name="Category">Required</attr>
+		<attr name="EditWhileRunning" type="Boolean">true</attr>
+		<attr name="RefreshOnChange" type="Boolean">true</attr>		
+		<attr name="Desc">Class code containing the attribute to be updated</attr>				
+	</datadef>
+	<datadef name="AttributeName">
+		<attr name="EditOrder" type="Integer">24</attr>
+		<attr name="Category">Required</attr>
+		<attr name="EditWhileRunning" type="Boolean">true</attr>
+		<attr name="Desc">The node attribute to update</attr>				
+	</datadef>
+	<datadef name="OutputType">
+		<attr name="Category">Hidden</attr>
+	</datadef>
+</nodedef> 
+<nodedef name="ZWaveNotificationSource" class="vdab.extnodes.zwave.ZWaveNotificationSource">
+    <attr name="ConsumedEventTypes">NONE</attr>
+    <attr name="PublishedEventTypes">String,Event</attr>
+    <attr name="NodeDescTemplate"> from ${Node}</attr>
+    <attr name="NodeOverview">Receives all notifications sent to the ZWave Controller for a specific Node.</attr>
+    <attr name="NodeQuality" >Beta</attr>   
+	<datadef name="Node">
+		<attr name="EditOrder" type="Integer">22</attr>
+		<attr name="Category">Required</attr>
+		<attr name="EditWhileRunning" type="Boolean">true</attr>
+		<attr name="Desc">The ZWave Node. Select ALL to receive all notifications. </attr>				
 	</datadef>
 </nodedef>
 <nodedef name="ZWaveSensor" class="vdab.extnodes.zwave.ZWaveSensor">
     <attr name="ConsumedEventTypes">NONE</attr>
     <attr name="PublishedEventTypes">String,Event</attr>
-    <attr name="NodeDescTemplate"> ${ZWavePort} ${Node}</attr>
-    <attr name="NodeOverview">Prototype which reads captures images from a Foscam Security Camera using appropriate HTTP posts. The address and port must be accessible and specified.</attr>
-    <attr name="NodeQuality" >Prototype</attr>   
-	<datadef name="ZWavePort">
-		<attr name="EditOrder" type="Integer">2</attr>
-		<attr name="Category">Required</attr>
-		<attr name="Desc">ZWave device port</attr>				
-	</datadef>
+    <attr name="NodeDescTemplate"> ${Node}</attr>
+    <attr name="NodeOverview">Receives binary or multilevel sensor information whenever the value changes.</attr>
+    <attr name="NodeQuality" >Beta</attr>   
 	<datadef name="Node">
 		<attr name="EditOrder" type="Integer">22</attr>
 		<attr name="Category">Required</attr>
 		<attr name="EditWhileRunning" type="Boolean">true</attr>
-		<attr name="Desc">Pick from the existing nodes of this type.</attr>				
+		<attr name="Desc">ZWave sensor node</attr>				
 	</datadef>
  </nodedef>
  <nodedef name="ZWaveSwitch" class="vdab.extnodes.zwave.ZWaveSwitch">
     <attr name="ConsumedEventTypes">Trigger,String,Event</attr>
     <attr name="PublishedEventTypes">NONE</attr>
-    <attr name="NodeDescTemplate"> ${ZWavePort} ${Node}</attr>
-    <attr name="NodeOverview">Turns on and off a ZWave switch. Sending a trigger event toggles the switch..</attr>
-    <attr name="NodeQuality" >Prototype</attr>   
-	<datadef name="ZWavePort">
-		<attr name="EditOrder" type="Integer">2</attr>
-		<attr name="Category">Required</attr>
-		<attr name="Desc">ZWave device port</attr>				
-	</datadef>
+    <attr name="NodeDescTemplate"> ${Node} is ${SwitchState}</attr>
+    <attr name="NodeOverview">Turns on and off a ZWave switch. Sending a trigger event toggles the switch state.</attr>
+    <attr name="NodeQuality" >Beta</attr>   
 	 <datadef name="SelectedElement">
 		<attr name="Category">Standard</attr>
 		<attr name="EditWhileRunning" type="Boolean">true</attr>
 		<attr name="EditOrder" type="Integer">15</attr>
+		<attr name="Desc">Select the specific simple boolean data item from the event used to set the switch state.</attr>
 	</datadef>
 	<datadef name="Node">
 		<attr name="EditOrder" type="Integer">22</attr>
 		<attr name="Category">Required</attr>
 		<attr name="EditWhileRunning" type="Boolean">true</attr>
-		<attr name="Desc">Pick from the existing nodes of this type.</attr>				
+		<attr name="Desc">ZWave switch node</attr>				
 	</datadef>
+ </nodedef>
+ <nodedef name="ZWaveDimmer" class="vdab.extnodes.zwave.ZWaveDimmer">
+    <attr name="ConsumedEventTypes">Trigger,String,Event</attr>
+    <attr name="PublishedEventTypes">NONE</attr>
+    <attr name="NodeDescTemplate"> ${Node} at ${DimmerLevel}</attr>
+    <attr name="NodeOverview">Sets the level of a ZWave dimmer when a integer betwee 0-99 is sent to the node.</attr>
+    <attr name="NodeQuality" >Beta</attr>   
+     <datadef name="SelectedElement">
+        <attr name="Category">Standard</attr>
+        <attr name="EditWhileRunning" type="Boolean">true</attr>
+        <attr name="EditOrder" type="Integer">15</attr>
+	<attr name="Desc">Select the specific simple numeric data item from the event used to set the dimmer level.</attr>
+    </datadef>
+    <datadef name="Node">
+        <attr name="EditOrder" type="Integer">22</attr>
+        <attr name="Category">Required</attr>
+        <attr name="EditWhileRunning" type="Boolean">true</attr>
+        <attr name="Desc">ZWave multilevel switch node (dimmer)</attr>                
+    </datadef>
  </nodedef>
 </nodedefs>

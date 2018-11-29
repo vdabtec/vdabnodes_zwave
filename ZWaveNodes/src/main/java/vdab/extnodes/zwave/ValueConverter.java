@@ -19,7 +19,7 @@ public class ValueConverter {
             case DECIMAL:
                 AtomicReference<Float> f = new AtomicReference<>();
                 Manager.get().getValueAsFloat(valueId, f);
-                return f.get();
+                return Double.valueOf(f.get()); // MJA - VDAB only works with doubles.
             case INT:
                 AtomicReference<Integer> i = new AtomicReference<>();
                 Manager.get().getValueAsInt(valueId, i);

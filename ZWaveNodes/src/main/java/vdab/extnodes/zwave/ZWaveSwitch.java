@@ -6,10 +6,17 @@ import com.lcrc.af.datatypes.AFEnum;
 
 public class ZWaveSwitch extends ZWaveTarget_A{
 	private boolean c_IsOn = false;
-
+	
+	public String get_SwitchState(){
+		if (c_IsOn)
+			return "ON";
+		else
+			return "OFF";
+	
+	}
 
 	public AnalysisDataDef def_Node(AnalysisDataDef theDataDef){
-			AFEnum theEnum = ZWaveNodeInfo.getNodeEnumForClasses("Switch", new short[]{37});
+			AFEnum theEnum = ZWaveNodeInfo.getNodeEnumForClasses("Switch", new short[]{ZWaveClassCode.SWITCH_BINARY});
 			theDataDef.setEnum(theEnum);
 
 		return theDataDef;
@@ -25,8 +32,7 @@ public class ZWaveSwitch extends ZWaveTarget_A{
 		else {
 			getZWaveManager().switchOneOn(id);
 			c_IsOn = true;
-		}	
-		
+		}		
 		
 	}
 
@@ -38,10 +44,14 @@ public class ZWaveSwitch extends ZWaveTarget_A{
 			return;
 		}
 		Boolean state = ad.getDataAsBoolean();
-		if (state.booleanValue())
+		if (state.booleanValue()){
 			getZWaveManager().switchOneOn(id);
-		else
+			c_IsOn = true;
+		}
+		else {
 			getZWaveManager().switchOneOff(id);
+			c_IsOn = false;
+		}
 		
 	}
 

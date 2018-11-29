@@ -16,7 +16,7 @@ import com.lcrc.af.util.StringUtility;
 public class ZWaveNodeInfo {
 	// Inner class to hold details of ValueIds for each class.
 	private class ClassInfo {
-		private final static int MAX_INDEX = 5;
+		public final static int MAX_INDEX = 20;
 		private ValueId[] c_ValueIds = new ValueId[MAX_INDEX];
 		public void updateValueId(ValueId valId){
 			int i= valId.getIndex();
@@ -31,9 +31,14 @@ public class ZWaveNodeInfo {
 		}
 		
 	}
+	private static Manager s_Manager ;
 	private static ZWaveNodeInfo[] s_Nodes = new ZWaveNodeInfo[255];
 	private static int s_MaxNodeId = 1;
 	public static void updateFromNotification(Manager manager, short id, Notification notification, Object objRef){
+		// Keep the manager singlton.
+		if (s_Manager == null)
+			s_Manager = manager;
+		
 		if (id > 254){
 			AnalysisObject.logError("ZWadeNodeInfo.updateFromNotification()","Node ID must be < 255 ID="+id);
 			return;
@@ -80,7 +85,44 @@ public class ZWaveNodeInfo {
 		if (s_Nodes[nodeId] == null)
 			return null;
 		
-		return s_Nodes[nodeId].getValueIdForClass(classId,  0);
+		return s_Nodes[nodeId].getValueIdForClass0(classId,  0);
+		
+	}
+	public static AFEnum getValueIndexEnumForClass(short nodeId, short classId){
+		if (s_Nodes[nodeId] == null)
+			return null;
+		
+		ValueId[] valIds = s_Nodes[nodeId].getValueIdsForClass0(classId);
+		if (valIds == null || valIds.length <= 0)
+			return null;
+		
+		AFEnum theEnum = new AFEnum("ZWaveNodeInfo_ClassAttributes");
+	
+		for (ValueId valId: valIds){
+			theEnum.addEntry((int) valId.getIndex(), s_Manager.getValueLabel(valId)) ;
+			
+		}
+		return theEnum;
+	}
+	public static ValueId[] getValueIdsForClass(short nodeId, short classId){
+		if (s_Nodes[nodeId] == null)
+			return null;
+		
+		return s_Nodes[nodeId].getValueIdsForClass0(classId);
+		
+	}
+	public static ValueId getValueIdForClass(short nodeId, short classId, short index){
+		if (s_Nodes[nodeId] == null)
+			return null;
+		
+		return s_Nodes[nodeId].getValueIdForClass0(classId,  index);
+		
+	}
+	public static AFEnum getClassCodeEnum(short nodeId){
+		if (s_Nodes[nodeId] == null)
+			return null;
+		
+		return s_Nodes[nodeId].getClassEnum();
 		
 	}
 	public static AFEnum getNodeEnum(){
@@ -89,14 +131,12 @@ public class ZWaveNodeInfo {
 		theEnum.addEntry(1, "Controller");
 		for (int n = 2 ; n <= s_MaxNodeId; n++){			
 			if (s_Nodes[n] != null){
-				StringBuilder sb = new StringBuilder("Node");
-				sb.append("_");
-				sb.append(n);
-				theEnum.addEntry(n, sb.toString());
+				theEnum.addEntry(n, s_Nodes[n].getNodeLabel());
 			}
 		}	
 		return theEnum;
 	}
+
 	public static AFEnum getNodeEnumForClasses(String label, short[] classIds){
 		
 		AFEnum theEnum = new AFEnum("ZWaveNodeInfo_"+label);
@@ -111,10 +151,11 @@ public class ZWaveNodeInfo {
 		}	
 		return theEnum;
 	}
+	private static final int MAX_CLASSCODE = 255;
 	private int c_NodeId ;
 	private int c_Status ;    // Make AFEnum?
 	private String c_NodeType;	
-	private ClassInfo[] c_ClassInfoArray = new ClassInfo[255] ;
+	private ClassInfo[] c_ClassInfoArray = new ClassInfo[MAX_CLASSCODE] ;
 		
 	public ZWaveNodeInfo(int id){
 		c_NodeId = id;
@@ -124,6 +165,24 @@ public class ZWaveNodeInfo {
 	}
 	public void setNodeType(String type){
 		c_NodeType = type;
+	}
+	public String getNodeType(){
+		return c_NodeType;
+	}
+	public String getNodeLabel(){
+		StringBuilder sb = new StringBuilder();
+		if (c_ClassInfoArray[ZWaveClassCode.SWITCH_MULTILEVEL] != null)
+			sb.append("Dimmer-");
+		else if ((c_ClassInfoArray[ZWaveClassCode.SWITCH_BINARY] != null))
+			sb.append("Switch-");
+		else if ((c_ClassInfoArray[ZWaveClassCode.SENSOR_BINARY] != null))
+			sb.append("Sensor-");
+		else if ((c_ClassInfoArray[ZWaveClassCode.SENSOR_MULTILEVEL] != null))
+			sb.append("Sensor-");
+		else 
+			sb.append("Node-");
+		sb.append(c_NodeId);
+		return sb.toString();
 	}
 	public void updateClassCodeInfo(short code, Notification notification){
 		if (c_ClassInfoArray[code] == null)
@@ -137,10 +196,34 @@ public class ZWaveNodeInfo {
 		}
 		return false;
 	}
-	public ValueId getValueIdForClass(short code, int index){
+	public AFEnum getClassEnum(){
+		AFEnum theEnum = new AFEnum("ZWaveClassesCodes_SUB");
+			for (int n = 0 ; n < MAX_CLASSCODE ; n++){		
+				if (c_ClassInfoArray[n] != null){
+					theEnum.addEntry(n, ZWaveClassCode.getEnum().getLabel(n));
+			}
+		}	
+		return theEnum;
+	}
+	
+
+	public ValueId getValueIdForClass0(short code, int index){
 		if (c_ClassInfoArray[code] == null)
 			return null;
 		
 		return c_ClassInfoArray[code].getValueId(index);
 	}
+	public ValueId[] getValueIdsForClass0(short code){
+		ArrayList<ValueId> valIds = new ArrayList<ValueId>();
+		if (c_ClassInfoArray[code] != null){
+			for (int n = 0; n < ClassInfo.MAX_INDEX; n++) {
+				ValueId valId = c_ClassInfoArray[code].getValueId(n);
+				if (valId != null)	
+					valIds.add(valId);
+			}
+		}
+
+		return valIds.toArray(new ValueId[valIds.size()]);
+	}
+
 }

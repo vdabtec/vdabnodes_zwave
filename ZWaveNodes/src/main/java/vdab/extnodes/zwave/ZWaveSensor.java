@@ -6,7 +6,7 @@ import com.lcrc.af.datatypes.AFEnum;
 
 public class ZWaveSensor extends ZWaveSource_A {
 	public AnalysisDataDef def_Node(AnalysisDataDef theDataDef){
-		AFEnum theEnum = ZWaveNodeInfo.getNodeEnumForClasses("Sensor", new short[]{48,49});
+		AFEnum theEnum = ZWaveNodeInfo.getNodeEnumForClasses("Sensor", new short[]{ZWaveClassCode.SENSOR_BINARY, ZWaveClassCode.SENSOR_MULTILEVEL});
 		theDataDef.setEnum(theEnum);
 
 		return theDataDef;

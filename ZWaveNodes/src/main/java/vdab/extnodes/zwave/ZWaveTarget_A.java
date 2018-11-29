@@ -7,18 +7,19 @@ import com.lcrc.af.AnalysisEvent;
 
 public abstract class ZWaveTarget_A extends Target_A {
 
-	private String c_ZWavePort;
 	private ZWaveManager c_ZWaveManager;
 	private Integer c_Node;
 	
-	public void set_ZWavePort(String port){
-		c_ZWavePort = port;
+	public ZWaveTarget_A(){
+		addDelegatedAttribute("ZWavePort", ZWaveCommonAttributes.getInstance());
+		addDelegatedAttribute("ZWaveConfigDirectory", ZWaveCommonAttributes.getInstance());
 	}
-
-	public String get_ZWavePort(){
-		return  c_ZWavePort;
+	public void set_LogLevel(Integer level){
+		super.set_LogLevel(level);
+		if (c_ZWaveManager != null)
+			c_ZWaveManager.updateLogLevel();
 	}
-
+	
 	public void set_Node(Integer node){
 		c_Node = node;
 	}
@@ -26,30 +27,27 @@ public abstract class ZWaveTarget_A extends Target_A {
 		return c_Node;
 	}
 
-
 	public void _init(){
-		initManager();
+		c_ZWaveManager = ZWaveManager.initManager(this);
 		super._init();
-
 	}
 	public void _start() {
-		if (initManager()){
-			super._start();
-			return ;
+		if (c_ZWaveManager == null){
+			c_ZWaveManager = ZWaveManager.initManager(this);
+			if (c_ZWaveManager == null){
+				_disable();
+				return;
+			}
 		}
-		_disable();
-		return;
+		super._start();	
 	}
-	private boolean initManager(){
-		c_ZWaveManager = ZWaveManager.getZWaveManager(c_ZWavePort);
-		if (c_ZWaveManager != null){
-			c_ZWaveManager.addZWaveTarget(this);
-			c_ZWaveManager.init();		
-			return c_ZWaveManager.isInitialized();
-		}
-		return false;
-		
+	
+	public void _stop() {
+		if (c_ZWaveManager != null)
+			c_ZWaveManager.removeZWaveNode(this);
+		super._stop();
 	}
+	
 	protected ZWaveManager getZWaveManager(){
 		return c_ZWaveManager;
 	}
