@@ -9,8 +9,13 @@ public abstract class ZWaveSource_A  extends AnalysisSource {
 	private ZWaveManager c_ZWaveManager;
 	private Integer c_Node;
 	public ZWaveSource_A(){
-		addDelegatedAttribute("ZWavePort", ZWaveCommonAttributes.getInstance());
-		addDelegatedAttribute("ZWaveConfigDirectory", ZWaveCommonAttributes.getInstance());
+		try {
+			addDelegatedAttribute("ZWavePort", ZWaveCommonAttributes.getInstance());
+			addDelegatedAttribute("ZWaveConfigDirectory", ZWaveCommonAttributes.getInstance());
+		}
+		catch (Exception e){
+			setError("Unable to set delegated attributes");
+		}
 	}
 	public void set_LogLevel(Integer level){
 		super.set_LogLevel(level);

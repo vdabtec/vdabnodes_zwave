@@ -14,8 +14,13 @@ public class ZWaveQueryService extends AnalysisService{
 	private Integer c_ClassCode;
 
 	public ZWaveQueryService(){
-		addDelegatedAttribute("ZWavePort", ZWaveCommonAttributes.getInstance());
-		addDelegatedAttribute("ZWaveConfigDirectory", ZWaveCommonAttributes.getInstance());
+		try {
+			addDelegatedAttribute("ZWavePort", ZWaveCommonAttributes.getInstance());
+			addDelegatedAttribute("ZWaveConfigDirectory", ZWaveCommonAttributes.getInstance());
+		}
+		catch (Exception e){
+			setError("Unable to set delegated attributes");
+		}
 		set_OutputType(OutputEventType.FULLEVENT); // Always outputs the event
 
 	}

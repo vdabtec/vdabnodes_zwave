@@ -11,9 +11,13 @@ public abstract class ZWaveTarget_A extends Target_A {
 	private Integer c_Node;
 	
 	public ZWaveTarget_A(){
-		addDelegatedAttribute("ZWavePort", ZWaveCommonAttributes.getInstance());
-		addDelegatedAttribute("ZWaveConfigDirectory", ZWaveCommonAttributes.getInstance());
-	}
+		try {
+			addDelegatedAttribute("ZWavePort", ZWaveCommonAttributes.getInstance());
+			addDelegatedAttribute("ZWaveConfigDirectory", ZWaveCommonAttributes.getInstance());
+		}
+		catch (Exception e){
+			setError("Unable to set delegated attributes");
+		}	}
 	public void set_LogLevel(Integer level){
 		super.set_LogLevel(level);
 		if (c_ZWaveManager != null)

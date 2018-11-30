@@ -11,8 +11,13 @@ public class ZWaveNotificationSource  extends AnalysisSource{
 	private Integer c_Node = Integer.valueOf(0); // Report all nodes
 	
 	public ZWaveNotificationSource(){
-		addDelegatedAttribute("ZWavePort", ZWaveCommonAttributes.getInstance());
-		addDelegatedAttribute("ZWaveConfigDirectory", ZWaveCommonAttributes.getInstance());
+		try {
+			addDelegatedAttribute("ZWavePort", ZWaveCommonAttributes.getInstance());
+			addDelegatedAttribute("ZWaveConfigDirectory", ZWaveCommonAttributes.getInstance());
+		}
+		catch (Exception e){
+			setError("Unable to set delegated attributes");
+		}
 	}
 	public void set_LogLevel(Integer level){
 		super.set_LogLevel(level);

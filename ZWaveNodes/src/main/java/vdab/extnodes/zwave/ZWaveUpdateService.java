@@ -14,8 +14,13 @@ public class ZWaveUpdateService extends AnalysisService{
 	private Integer c_ClassCode;
 	private Integer c_Index;
 	public ZWaveUpdateService(){
-		addDelegatedAttribute("ZWavePort", ZWaveCommonAttributes.getInstance());
-		addDelegatedAttribute("ZWaveConfigDirectory", ZWaveCommonAttributes.getInstance());
+		try {
+			addDelegatedAttribute("ZWavePort", ZWaveCommonAttributes.getInstance());
+			addDelegatedAttribute("ZWaveConfigDirectory", ZWaveCommonAttributes.getInstance());
+		}
+		catch (Exception e){
+			setError("Unable to set delegated attributes");
+		}
 		set_OutputType(OutputEventType.BOOLEAN); // Always outputs a boolean succeeded or failed.
 	}
 	public void set_LogLevel(Integer level){
