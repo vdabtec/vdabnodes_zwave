@@ -3,6 +3,7 @@ package vdab.extnodes.zwave;
 import com.lcrc.af.AnalysisDataDef;
 import com.lcrc.af.AnalysisObject;
 
+
 public class ZWaveCommonAttributes {
 	private static ZWaveCommonAttributes s_Instance = new ZWaveCommonAttributes();
 	private static AnalysisDataDef[] s_ZWaveManger_ddefs = new AnalysisDataDef[]{

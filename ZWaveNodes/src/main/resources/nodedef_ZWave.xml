@@ -4,7 +4,7 @@
     <attr name="ConsumedEventTypes">Trigger,Event</attr>
     <attr name="PublishedEventTypes">String,Event</attr>
     <attr name="NodeDescTemplate"> ${Node}: ${ClassCode}</attr>
-    <attr name="NodeOverview">Returns all the ZWave node attributes associated with a specific class code on the selected node.</attr>
+    <attr name="NodeOverview">Returns all the ZWave node attributes associated with a specific class code on the selected node!</attr>
     <attr name="NodeQuality" >Beta</attr>   
 	<datadef name="Node">
 		<attr name="EditOrder" type="Integer">22</attr>
