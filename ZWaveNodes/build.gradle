@@ -6,7 +6,7 @@ targetCompatibility = 1.7
 
 dependencies {
     compile files('build/vdab/VDABCore.jar' )
-	compile files('lib/zwave4j.jar' )
+	compile files('libs/zwave4j.jar' )
  }
 //Get dependencies from Maven central repository
 repositories {
