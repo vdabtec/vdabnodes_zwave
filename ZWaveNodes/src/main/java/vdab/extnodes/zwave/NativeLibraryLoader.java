@@ -2,9 +2,12 @@ package vdab.extnodes.zwave;
 
 import java.io.*;
 
+import com.lcrc.af.AnalysisObject;
+
 /**
  * @author zagumennikov
  */
+
 public class NativeLibraryLoader {
 
     public static final String NATIVE_LIBS_DIRECTORY_NAME = "native_libs";
@@ -18,9 +21,9 @@ public class NativeLibraryLoader {
 
     private static final String TEMP_FILE_PREFIX = "native-lib-";
 
-    public static void loadLibrary(String libraryName, Class clazz) {
-        String libraryPath = getLibraryPath(libraryName);
-	System.out.println("LIBRARY PATH= "+libraryPath);
+    public static void loadLibrary(AnalysisObject ao, String libraryName, Class clazz) {
+         String libraryPath = getLibraryPath(libraryName);
+        ao.logInfo("NativeLibraryLoader: Attempting to load the native library PATH="+libraryPath);
 
         File tempLibraryFile;
         try (InputStream libraryStream = clazz != null ? clazz.getResourceAsStream(libraryPath) : ClassLoader.getSystemResourceAsStream(libraryPath)) {
@@ -38,13 +41,13 @@ public class NativeLibraryLoader {
                     tempLibraryStream.write(buffer, 0, len);
                 }
             }
-        } catch (IOException e) {
+        } catch (Throwable e) {
+            ao.setError("NativeLibraryLoader: Unable to load native library PATH="+libraryPath);
             throw new RuntimeException(e);
         }
 
         System.load(tempLibraryFile.getAbsolutePath());
-
-        //noinspection ResultOfMethodCallIgnored
+        ao.logInfo("NativeLibraryLoader: Load completed PATH="+libraryPath);
         tempLibraryFile.delete();
     }
 

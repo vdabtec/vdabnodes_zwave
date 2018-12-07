@@ -11,6 +11,7 @@ import org.zwave4j.NotificationType;
 import org.zwave4j.NotificationWatcher;
 import org.zwave4j.Options;
 import org.zwave4j.ValueId;
+import org.zwave4j.ZWave4j;
 
 import com.lcrc.af.AnalysisCompoundData;
 import com.lcrc.af.AnalysisData;
@@ -81,6 +82,7 @@ public class ZWaveManager  extends AnalysisObject implements NotificationWatcher
 		}
 
 		try {
+			NativeLibraryLoader.loadLibrary(this, ZWave4j.LIBRARY_NAME, ZWave4j.class);
 			final Options options = Options.create(c_ZWaveConfigDirectory, "", "");
 			options.addOptionBool("ConsoleOutput", false);
 			options.lock();
