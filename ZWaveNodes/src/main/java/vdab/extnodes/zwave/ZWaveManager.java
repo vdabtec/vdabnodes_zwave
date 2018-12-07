@@ -46,6 +46,7 @@ public class ZWaveManager  extends AnalysisObject implements NotificationWatcher
 		if (manager == null){
 			manager = new ZWaveManager(port);
 			String dir = attrs.get_ZWaveConfigDirectory();
+		
 			if (dir != null)
 				manager.setConfigDirectory(dir);
 			s_PortZWaveManager_map.put(port, manager);
@@ -59,7 +60,7 @@ public class ZWaveManager  extends AnalysisObject implements NotificationWatcher
 	private long c_HomeId;
 	private Manager c_Manager;
 	private boolean c_IsReady = false;
-	private String c_ZWaveConfigDirectory = "/home/pi/open-zwave/config" ;
+	private String c_ZWaveConfigDirectory ;
 	
 	private String c_ZWavePort;
 
@@ -166,7 +167,6 @@ public class ZWaveManager  extends AnalysisObject implements NotificationWatcher
 			String label = c_Manager.getValueLabel(valId);
 			acd.addAnalysisData(label,ValueConverter.getValue(notification.getValueId()));
 		}	
-		
 		return acd;
 	}
 
