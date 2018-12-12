@@ -92,8 +92,8 @@ public class ZWaveManager  extends AnalysisObject implements NotificationWatcher
 			c_Manager.addDriver(c_ZWavePort);
 
 		}
-		catch (Exception e){
-			setError("Uable to initialize ZWave connection e>"+e);
+		catch (Throwable e){
+			setError("Uable to initialize ZWave connection, ZWave nodes will not work. e>"+e);
 			c_Manager = null;
 		}
 
