@@ -84,6 +84,7 @@ public class ZWaveManager  extends AnalysisObject implements NotificationWatcher
 
 		try {
 			NativeLibraryLoader.loadLibrary(this, ZWave4j.LIBRARY_NAME, ZWave4j.class);
+			logInfo("Loading and locking the ZWave4J Manager" );
 			final Options options = Options.create(c_ZWaveConfigDirectory, "", "");
 			options.addOptionBool("ConsoleOutput", false);
 			options.lock();
