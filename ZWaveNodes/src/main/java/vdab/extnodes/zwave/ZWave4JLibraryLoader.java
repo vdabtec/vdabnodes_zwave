@@ -8,7 +8,7 @@ import com.lcrc.af.AnalysisObject;
  * @author zagumennikov
  */
 
-public class NativeLibraryLoader {
+public class ZWave4JLibraryLoader {
 
     public static final String NATIVE_LIBS_DIRECTORY_NAME = "native_libs";
     public static final String WINDOWS_DIRECTORY_NAME = "windows";

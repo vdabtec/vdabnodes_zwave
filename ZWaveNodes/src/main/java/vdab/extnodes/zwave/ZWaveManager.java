@@ -12,6 +12,7 @@ import org.zwave4j.NotificationWatcher;
 import org.zwave4j.Options;
 import org.zwave4j.ValueId;
 import org.zwave4j.ZWave4j;
+import org.zwave4j.NativeLibraryLoader;
 
 import com.lcrc.af.AnalysisCompoundData;
 import com.lcrc.af.AnalysisData;
@@ -83,7 +84,8 @@ public class ZWaveManager  extends AnalysisObject implements NotificationWatcher
 		}
 
 		try {
-			NativeLibraryLoader.loadLibrary(this, ZWave4j.LIBRARY_NAME, ZWave4j.class);
+			NativeLibraryLoader.loadLibrary(ZWave4j.LIBRARY_NAME, ZWave4j.class);
+	//		ZWave4JLibraryLoader.loadLibrary(this, ZWave4j.LIBRARY_NAME, ZWave4j.class);
 			logInfo("Loading and locking the ZWave4J Manager" );
 			final Options options = Options.create(c_ZWaveConfigDirectory, "", "");
 			options.addOptionBool("ConsoleOutput", false);
