@@ -84,8 +84,10 @@ public class ZWaveManager  extends AnalysisObject implements NotificationWatcher
 		}
 
 		try {
-			NativeLibraryLoader.loadLibrary(ZWave4j.LIBRARY_NAME, ZWave4j.class);
-	//		ZWave4JLibraryLoader.loadLibrary(this, ZWave4j.LIBRARY_NAME, ZWave4j.class);
+	//		STANDARD LOADER - Doesn't work do to changes in ARM library path (arm --> arm-v7)
+	//		NativeLibraryLoader.loadLibrary(ZWave4j.LIBRARY_NAME, ZWave4j.class);
+	//		This is a somewhat customized loader.
+			ZWave4JLibraryLoader.loadLibrary(this, ZWave4j.LIBRARY_NAME, ZWave4j.class);
 			logInfo("Loading and locking the ZWave4J Manager" );
 			final Options options = Options.create(c_ZWaveConfigDirectory, "", "");
 			options.addOptionBool("ConsoleOutput", false);
