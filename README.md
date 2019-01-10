@@ -6,7 +6,7 @@ Z-wave is a widely supported SmartHome proocol. A half dozen VDAB ZWave nodes pr
 | | |
 |  --- |  :---: |
 | Application Page    | [IoT Processing Hub](https://vdabtec.com/vdab/app-guides/zwave) |
-| Demo Web Link   | [pi-demo.vdabsoft.com:31156/vdab](http://pi-demo.vdabsoft.com:31156/vdab) |
+| Demo Web Link   | [pi-demo.vdabsoft.com:31156/vdab](http://pi-demo.vdabsoft.com:31158/vdab) |
 
 ### Features
 <ul>
