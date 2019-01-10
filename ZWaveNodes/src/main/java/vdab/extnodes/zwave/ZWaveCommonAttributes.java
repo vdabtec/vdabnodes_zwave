@@ -44,7 +44,11 @@ public class ZWaveCommonAttributes {
 		return  c_ZWaveConfigDirectory;
 	}
 	public void set_ZWaveConfigDirectory(String dir){
-		c_ZWaveConfigDirectory = dir;
+		// Only set it if it exists.
+		if (new File(dir).exists())
+			c_ZWaveConfigDirectory = dir;
+		else
+			AnalysisObject.logError("ZWaveCommonAttributes.set_ZWaveConfigDirectory", "The ZWave Config directory does not exist DIR="+dir);
 	}
 	public AnalysisDataDef def_ZWaveConfigDirectory(AnalysisDataDef theDataDef){
 		String[] dirs = AFFileUtility.getAllDirectories(FilePathType.ABSOLUTE, c_ZWaveConfigDirectory);
