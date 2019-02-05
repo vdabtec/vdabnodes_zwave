@@ -68,8 +68,15 @@
 	<datadef name="Node">
 		<attr name="EditOrder" type="Integer">22</attr>
 		<attr name="Category">Required</attr>
+		<attr name="RefreshOnChange" type="Boolean">true</attr>		
 		<attr name="EditWhileRunning" type="Boolean">true</attr>
 		<attr name="Desc">The ZWave Node. Select ALL to receive all notifications. </attr>				
+	</datadef>
+	<datadef name="ClassCode">
+		<attr name="EditOrder" type="Integer">23</attr>
+		<attr name="Category">Standard</attr>
+		<attr name="EditWhileRunning" type="Boolean">true</attr>
+		<attr name="Desc">Class code for the notifications that will be returned</attr>				
 	</datadef>
 </nodedef>
 <nodedef name="ZWaveSensor" class="vdab.extnodes.zwave.ZWaveSensor">

@@ -183,9 +183,16 @@ public class ZWaveManager  extends AnalysisObject implements NotificationWatcher
 		
 		if (c_ZWaveNotificationSourceList.size() > 0){
 			AnalysisData ad = getVDABData(notification,info);
+			int code = 	notification.getValueId().getCommandClassId();
 			for (ZWaveNotificationSource as: c_ZWaveNotificationSourceList){
-				if (as.isRunning() && as.shouldReport((int) nodeId))
-					as.publishNotificationEvent(ad);
+				if (as.isRunning() && as.shouldReport((int) nodeId)){
+					if (as.get_ClassCode() == null){
+						as.publishNotificationEvent(ad);
+					}
+					else if (as.get_ClassCode().intValue() == code){
+						as.publishNotificationEvent(ad);			
+					}
+				}
 			}
 		}
 	}

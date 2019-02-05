@@ -18,6 +18,7 @@ public class ZWaveClassCode {
 	public final static int BATTERY = 128;
 	public final static int WAKE_UP = 132;
 	public final static int VERSION = 134;
+	public final static int SENSOR_ALARM = 156;
 
 	private static AFEnum s_EnumZWaveClassCode = new AFEnum("ZWaveClassCode")
 	.addEntry(ZWaveClassCode.BASIC,"Basic")
@@ -34,6 +35,7 @@ public class ZWaveClassCode {
 	.addEntry(ZWaveClassCode.BATTERY, "Battery")
 	.addEntry(ZWaveClassCode.WAKE_UP, "Wake-Up")
 	.addEntry(ZWaveClassCode.VERSION, "Version")
+	.addEntry(ZWaveClassCode.SENSOR_ALARM, "Sensor Alarm")
 	;
 	public static AFEnum getEnum(){
 		return s_EnumZWaveClassCode ;

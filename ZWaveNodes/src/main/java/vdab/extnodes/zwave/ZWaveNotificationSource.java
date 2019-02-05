@@ -9,7 +9,7 @@ public class ZWaveNotificationSource  extends AnalysisSource{
 
 	private ZWaveManager c_ZWaveManager;
 	private Integer c_Node = Integer.valueOf(0); // Report all nodes
-	
+	private Integer c_ClassCode;
 	public ZWaveNotificationSource(){
 		try {
 			addDelegatedAttribute("ZWavePort", ZWaveCommonAttributes.getInstance());
@@ -40,6 +40,18 @@ public class ZWaveNotificationSource  extends AnalysisSource{
 	public AnalysisDataDef def_Node(AnalysisDataDef theDataDef){
 		AFEnum theEnum = ZWaveNodeInfo.getNodeEnum();
 		theDataDef.setEnum(theEnum);
+		return theDataDef;
+	}
+	public void set_ClassCode(Integer code){
+		c_ClassCode = code;
+	}
+	public Integer get_ClassCode(){
+		return c_ClassCode;
+	}
+	public AnalysisDataDef def_ClassCode(AnalysisDataDef theDataDef){
+		AFEnum theEnum = ZWaveNodeInfo.getClassCodeEnum(c_Node.shortValue());
+		if (theEnum != null)
+			theDataDef.setEnum(theEnum);
 		return theDataDef;
 	}
 
