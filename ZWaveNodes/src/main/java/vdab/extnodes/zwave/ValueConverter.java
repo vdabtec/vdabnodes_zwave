@@ -31,7 +31,8 @@ public class ValueConverter {
             case SHORT:
                 AtomicReference<Short> s = new AtomicReference<>();
                 Manager.get().getValueAsShort(valueId, s);
-                return s.get();
+                return Integer.valueOf(s.get()); // MJA - VDAB doesn't work with shorts.
+ 
             case STRING:
                 AtomicReference<String> ss = new AtomicReference<>();
                 Manager.get().getValueAsString(valueId, ss);
